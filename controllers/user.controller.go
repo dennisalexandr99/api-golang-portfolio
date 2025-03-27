@@ -9,6 +9,17 @@ import (
 	"github.com/labstack/echo"
 )
 
+func Login(c echo.Context) error {
+	userUniqueId := c.FormValue("userUniqueId")
+	password := c.FormValue("password")
+	result, err := models.Login(userUniqueId, password)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, result)
+}
+
 func FetchAllUser(c echo.Context) error {
 	result, err := models.FetchAllUser()
 	if err != nil {
@@ -26,7 +37,7 @@ func CreateNewUser(c echo.Context) error {
 	newIdRole := c.FormValue("newIdRole")
 	intNewIdRole, err := strconv.Atoi(newIdRole)
 
-	result, err := models.CreateNewUser(newFullName, newUniqueId, newEmail, newPassword, intNewIdRole)
+	result, err := models.CreateNewUser(c, newFullName, newUniqueId, newEmail, newPassword, intNewIdRole)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -35,14 +46,13 @@ func CreateNewUser(c echo.Context) error {
 }
 
 func EditUser(c echo.Context) error {
-	targetUserUniqueId := c.FormValue("targetUserUniqueId")
 	newFullName := c.FormValue("newFullName")
 	newEmail := c.FormValue("newEmail")
 	newPassword := c.FormValue("newPassword")
 	newIdRole := c.FormValue("newIdRole")
 	intNewIdRole, err := strconv.Atoi(newIdRole)
 
-	result, err := models.EditUser(targetUserUniqueId, newFullName, newEmail, newPassword, intNewIdRole)
+	result, err := models.EditUser(c, newFullName, newEmail, newPassword, intNewIdRole)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
@@ -51,10 +61,9 @@ func EditUser(c echo.Context) error {
 }
 
 func DeleteUser(c echo.Context) error {
-	userUniqueId := c.FormValue("userUniqueId")
 	password := c.FormValue("password")
 
-	result, err := models.DeleteUser(userUniqueId, password)
+	result, err := models.DeleteUser(c, password)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
